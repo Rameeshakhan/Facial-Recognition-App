@@ -1,0 +1,54 @@
+/* modal.module.css */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* semi-transparent black background */
+}
+
+.modal-wrapper {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 30px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  width: 30%;
+  height: auto;
+}
+
+.modal-content {
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.close-icon {
+  border: none;
+  font-size: 24px;
+  color: #333;
+  position: absolute;
+  top: -20px;
+  right: 0px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.close-icon:focus {
+  outline: none;
+}
