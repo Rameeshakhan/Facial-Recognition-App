@@ -19,6 +19,10 @@
   border: 1px solid rgb(183, 43, 66)
 }
 
+.button:hover{
+  background-color:rgb(183, 43, 66) ;
+  color: white;
+}
 .activeButton {
   background-color: rgb(183, 43, 66);
   color: white;
