@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styles from '../assets/css/sidebar.module.css';
 import logo from "../assets/images/logo.png";
-import wallpaper from "../assets/images/wallpaper.jpg"
 import AddYourself from "./AddYourself";
 import GetYourDetails from './GetYourDetails';
 

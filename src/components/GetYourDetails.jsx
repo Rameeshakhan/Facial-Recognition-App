@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import axios from 'axios';
 import Modal from './Modal';
@@ -14,6 +14,9 @@ const videoConstraints = {
 const GetYourDetails = () => {
   const [picture, setPicture] = useState(null);
   const [modal, setModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');
+  const [submitButtonClicked, setSubmitButtonClicked] = useState(false);
   const webcamRef = useRef(null);
 
   const openModal = () => {
@@ -22,6 +25,7 @@ const GetYourDetails = () => {
 
   const closeModal = () => {
     setModal(false);
+    window.location.reload();
   };
 
   const capture = useCallback(() => {
@@ -37,10 +41,11 @@ const GetYourDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (picture === null) {
-      console.log('No picture available to submit.');
+    if (!submitButtonClicked) {
       return;
     }
+
+    setLoading(true);
 
     const convertedPicture = await fetch(picture)
       .then((res) => res.blob())
@@ -51,44 +56,57 @@ const GetYourDetails = () => {
 
     if (convertedPicture === null) {
       console.log('Failed to convert picture to Blob.');
+      setLoading(false);
       return;
     }
 
     const formData = new FormData();
     formData.append('image', convertedPicture);
-
     try {
       const response = await axios.post('http://13.42.98.127:8015/faceVer', formData);
-
       if (response.status === 200) {
-        toast.success('Image sent to the server successfully.');
+        // if(response.data.name){
+        //   openModal();
+        //   setName(response.data.name);
+        // }
+        // else{
+        //   toast.error("Unable to recognize the face")
+        // }
+        openModal();
       } else {
         toast.error('Failed to send the image to the server.');
       }
     } catch (error) {
       toast.error('Error occurred while sending the image to the server:', error);
+    } finally {
+      setLoading(false);
+      setSubmitButtonClicked(false);
     }
-
-    openModal();
   };
 
-  // const name = "Rameesha";
+  useEffect(() => {
+    if (submitButtonClicked && !loading && modal) {
+      setPicture(null);
+      setName('');
+    }
+  }, [submitButtonClicked, loading, modal]);
+
 
   return (
     <>
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "20px",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '20px',
         }}
       >
         <form
           style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
           }}
           onSubmit={handleSubmit}
         >
@@ -112,12 +130,12 @@ const GetYourDetails = () => {
                 <button
                   onClick={retakePhoto}
                   style={{
-                    padding: "10px 40px",
-                    border: "none",
-                    borderRadius: "8px",
-                    backgroundColor: "rgb(0, 0, 143)",
+                    padding: '10px 40px',
+                    border: 'none',
+                    borderRadius: '8px',
+                    backgroundColor: 'rgb(0, 0, 143)',
                     color: 'white',
-                    margin: "10px",
+                    margin: '10px',
                   }}
                 >
                   Retake
@@ -125,27 +143,29 @@ const GetYourDetails = () => {
                 <button
                   type="submit"
                   style={{
-                    padding: "10px 40px",
-                    border: "none",
-                    borderRadius: "8px",
-                    backgroundColor: "rgb(0, 0, 143)",
+                    padding: '10px 40px',
+                    border: 'none',
+                    borderRadius: '8px',
+                    backgroundColor: 'rgb(0, 0, 143)',
                     color: 'white',
-                    margin: "10px",
+                    margin: '10px',
                   }}
+                  disabled={loading || !picture}
+                  onClick={() => setSubmitButtonClicked(true)}
                 >
-                  Submit
+                  {loading ? 'Loading...' : 'Submit'}
                 </button>
               </>
             ) : (
               <button
                 onClick={capture}
                 style={{
-                  padding: "10px 40px",
-                  border: "none",
-                  borderRadius: "8px",
-                  backgroundColor: "rgb(0, 0, 143)",
+                  padding: '10px 40px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgb(0, 0, 143)',
                   color: 'white',
-                  margin: "10px",
+                  margin: '10px',
                 }}
               >
                 Capture
@@ -154,13 +174,14 @@ const GetYourDetails = () => {
           </div>
         </form>
       </div>
-      <ToastContainer />
       {modal && (
         <Modal isOpen={modal} onClose={closeModal}>
-          <h2>Face Successfully Recognized</h2><br/>
-          <p>Name : {name}</p>
+          <h2>Face Successfully Recognized</h2>
+          <br />
+          <p>Name: {name}</p>
         </Modal>
       )}
+      <ToastContainer />
     </>
   );
 };
